@@ -41,4 +41,4 @@ def create_rag_chain(chunks):
         | StrOutputParser()
     )
 
-    return rag_chain3
+    return rag_chain

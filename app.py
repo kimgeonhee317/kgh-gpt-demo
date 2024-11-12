@@ -1,8 +1,12 @@
 import streamlit as st
 import os
+import sys
 from dotenv import load_dotenv
 from src.document_processor import process_document
 from src.rag_chain import create_rag_chain
+
+# check python version
+#st.write("Python executable being used:", sys.executable)
 
 # Load environment variables
 load_dotenv()
@@ -21,6 +25,10 @@ with st.sidebar:
     if api_key:
         os.environ["OPENAI_API_KEY"] = api_key
 
+# local
+api_key = os.getenv("OPENAI_API_KEY")
+print(api_key)
+
 # File uploader
 uploaded_file = st.file_uploader("Choose a file", type=["pdf", "png", "jpg", "jpeg"])
 
@@ -35,7 +43,7 @@ if uploaded_file is not None:
                 try:
                     # Process the document
                     chunks = process_document(uploaded_file.name)
-
+                    print(chunks)
                     # Create RAG chain
                     st.session_state.rag_chain = create_rag_chain(chunks)
 
