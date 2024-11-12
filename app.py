@@ -1,51 +1,64 @@
-from user_onboarding import user_onboarding
-from session_functions import load_session, delete_session, save_session
-from logging_functions import reset_log
-from quiz_UI import show_quiz
-from training_UI import show_training_UI
 import streamlit as st
 import os
+from dotenv import load_dotenv
+from src.document_processor import process_document
+from src.rag_chain import create_rag_chain
 
-def main():
-    st.set_page_config(layout="wide")
-    st.sidebar.title('Chatbot adaption Demo for NAVER HCX')
+# Load environment variables
+load_dotenv()
 
-    model = "HCX003"
-    st.session_state['model'] = model
+st.set_page_config(page_title="RAG Chatbot", page_icon="🤖")
 
-    st.sidebar.markdown(f'### 연결 모델: {model}')
+st.title("RAG Chatbot")
 
-    if 'OPENAI_API_KEY' not in st.session_state or not st.session_state['OPENAI_API_KEY']:
-        #api_key = st.text_input("Enter your OpenAI API Key (or leave blank if running locally): ")
-        api_key = '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'
-        st.session_state['OPENAI_API_KEY'] = api_key
-        os.environ['OPENAI_API_KEY'] = api_key
+# Initialize session state
+if "rag_chain" not in st.session_state:
+    st.session_state.rag_chain = None
 
-    # Debugging: Print the session state
-    print(st.session_state)
+# Sidebar for API key input
+with st.sidebar:
+    api_key = st.text_input("Enter your OpenAI API Key", type="password")
+    if api_key:
+        os.environ["OPENAI_API_KEY"] = api_key
 
-    # Check if the user is returning and has opted to take a quiz
-    if 'resume_session' in st.session_state and st.session_state['resume_session']:
-        #st.write(f"대화를 시작합니다!")
-        # If resuming, clear previous content and show the training UI
-        show_training_UI(st.session_state['user_name'], st.session_state['goal'])
-    elif not load_session(st.session_state): # Check if the user is new
-        user_onboarding()  # Show the onboarding screen for new users
+# File uploader
+uploaded_file = st.file_uploader("Choose a file", type=["pdf", "png", "jpg", "jpeg"])
+
+if uploaded_file is not None:
+    if st.button("Process File"):
+        if api_key:
+            with st.spinner("Processing file..."):
+                # Save the uploaded file temporarily
+                with open(uploaded_file.name, "wb") as f:
+                    f.write(uploaded_file.getbuffer())
+
+                try:
+                    # Process the document
+                    chunks = process_document(uploaded_file.name)
+
+                    # Create RAG chain
+                    st.session_state.rag_chain = create_rag_chain(chunks)
+
+                    st.success("File processed successfully!")
+                except ValueError as e:
+                    st.error(str(e))
+                finally:
+                    # Remove the temporary file
+                    os.remove(uploaded_file.name)
+        else:
+            st.error("Please provide your OpenAI API key.")
+
+# Query input
+query = st.text_input("Ask a question about the uploaded document")
+
+if st.button("Ask"):
+    if st.session_state.rag_chain and query:
+        with st.spinner("Generating answer..."):
+            result = st.session_state.rag_chain.invoke(query)
+
+            st.subheader("Answer:")
+            st.write(result)
+    elif not st.session_state.rag_chain:
+        st.error("Please upload and process a file first.")
     else:
-        # For returning users, display options to resume or start a new session
-        st.write(f"다시 오신 것을 환영합니다. {st.session_state['user_name']}!")
-        col1, col2 = st.columns(2)
-        if col1.button(f"챗봇을 재개합니다"):
-            # Mark the session to be resumed and rerun to clear previous content
-            st.session_state['resume_session'] = True
-            st.rerun()
-        if col2.button('새로운 세션을 시작합니다'):
-            delete_session(st.session_state)
-            reset_log()
-            # Clear session state and rerun for a fresh start
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
-            st.rerun()
-
-if __name__ == "__main__":
-    main()
+        st.error("Please enter a question.")
