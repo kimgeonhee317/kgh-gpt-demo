@@ -1,17 +1,20 @@
 import streamlit as st
+import langchain
 import os
 import sys
+import getpass
 from dotenv import load_dotenv
 from src.document_processor import process_document
 from src.rag_chain import create_rag_chain
+
 
 # check python version
 #st.write("Python executable being used:", sys.executable)
 
 # Load environment variables
 load_dotenv()
-
-st.set_page_config(page_title="Test Chatbot", page_icon="🤖")
+langchain.verbose = True
+st.set_page_config(page_title="NAVER HCX003 챗봇 데모버전(RAG 등 테스트용)", page_icon="🤖")
 
 st.title("Test Chatbot")
 
@@ -21,13 +24,17 @@ if "rag_chain" not in st.session_state:
 
 # Sidebar for API key input
 with st.sidebar:
-    api_key = st.text_input("Enter your OpenAI API Key", type="password")
+    studio_key = st.text_input("Enter your CLOVA STUDIO Key", type="password")
+    api_key = st.text_input("Enter your API Key", type="password")
     if api_key:
-        os.environ["OPENAI_API_KEY"] = api_key
+        os.environ["NCP_CLOVASTUDIO_API_KEY"] = studio_key
+        os.environ["NCP_APIGW_API_KEY"] = api_key
 
 # local
-#api_key = os.getenv("OPENAI_API_KEY")
-#print(api_key)
+studio_key = os.getenv("NCP_CLOVASTUDIO_API_KEY")
+gw_key = os.getenv("NCP_APIGW_API_KEY")
+api_key = os.getenv("OPENAI_API_KEY")
+print(studio_key, gw_key, api_key)
 
 # File uploader
 uploaded_file = st.file_uploader("Choose a file", type=["pdf", "png", "jpg", "jpeg"])
@@ -43,10 +50,9 @@ if uploaded_file is not None:
                 try:
                     # Process the document
                     chunks = process_document(uploaded_file.name)
-                    print(chunks)
                     # Create RAG chain
                     st.session_state.rag_chain = create_rag_chain(chunks)
-
+                    print(st.session_state.rag_chain)
                     st.success("File processed successfully!")
                 except ValueError as e:
                     st.error(str(e))
