@@ -26,8 +26,8 @@ with st.sidebar:
         os.environ["OPENAI_API_KEY"] = api_key
 
 # local
-api_key = os.getenv("OPENAI_API_KEY")
-print(api_key)
+#api_key = os.getenv("OPENAI_API_KEY")
+#print(api_key)
 
 # File uploader
 uploaded_file = st.file_uploader("Choose a file", type=["pdf", "png", "jpg", "jpeg"])
