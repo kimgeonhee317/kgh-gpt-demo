@@ -11,9 +11,9 @@ from src.rag_chain import create_rag_chain
 # Load environment variables
 load_dotenv()
 
-st.set_page_config(page_title="RAG Chatbot", page_icon="🤖")
+st.set_page_config(page_title="Test Chatbot", page_icon="🤖")
 
-st.title("RAG Chatbot")
+st.title("Test Chatbot")
 
 # Initialize session state
 if "rag_chain" not in st.session_state:

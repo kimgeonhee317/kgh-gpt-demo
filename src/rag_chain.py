@@ -32,7 +32,7 @@ def create_rag_chain(chunks):
     retriever = doc_search.as_retriever(
         search_type="similarity", search_kwargs={"k": 5} # k is the number of similar documents to retrieve
     )
-    llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
 
     rag_chain = (
         {"context": retriever | format_docs, "question": RunnablePassthrough()}
