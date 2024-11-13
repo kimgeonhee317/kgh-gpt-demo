@@ -1,3 +1,7 @@
+import(‘pysqlite3’)
+import sys
+sys.modules[‘sqlite3’] = sys.modules.pop(‘pysqlite3’)
+
 import streamlit as st
 import langchain
 import os
@@ -6,6 +10,7 @@ import getpass
 from dotenv import load_dotenv
 from src.document_processor import process_document, show_chunk
 from src.rag_chain import create_rag_chain
+
 
 # check python version
 #st.write("Python executable being used:", sys.executable)
