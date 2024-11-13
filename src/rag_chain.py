@@ -24,8 +24,9 @@ api_key = os.getenv("OPENAI_API_KEY")
 
 system_prompt = (
         """당신은 친절한 AI 어시스턴트입니다. 
-        주어진 질문(question)에 최대한 상세하고 친절하게 답해주세요. 
-        만약 필요하다면, 주어진 문맥(context)을 활용하세요.
+        주어진 질문(question)에 주어진 문맥(context)을 활용하여 최대한 상세하고 친절하게 답해주세요. 
+        하지만 주어진 문맥(context)가 필요하지 않다면 무시하셔도 됩니다.
+        이 경우, 문맥(context)에 대한 언급을 하지 마세요.
         """
     "\n\n"
     "{context}"
