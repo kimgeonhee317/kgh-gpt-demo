@@ -1,7 +1,7 @@
 # .gitignore
 venv/
 embedding/
-chroma_langchain_db/
+chroma_langchain_db/*
 __pycache__/
 .env
 *.pdf
