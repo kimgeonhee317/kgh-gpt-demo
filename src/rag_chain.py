@@ -90,9 +90,9 @@ def create_rag_chain(chunks):
 
     llm = ChatClovaX(
         model="HCX-003",
-        maxTokens = 2048,
+        max_tokens = 2048,
         temperature= 0.5,
-        repeatPenalty = 5
+        repeat_penalty= 5
     )
 
     rag_chain = (
