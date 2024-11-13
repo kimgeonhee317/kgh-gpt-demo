@@ -23,9 +23,9 @@ chromadb.api.client.SharedSystemClient.clear_system_cache()
 api_key = os.getenv("OPENAI_API_KEY")
 
 system_prompt = (
-        """당신은 질문-답변(Question-Answering)을 수행하는 친절한 AI 어시스턴트입니다. 
-        당신의 임무는 당신의 지식을 활용하여, 주어진 문맥(context) 에서 주어진 질문(question) 에 답하는 것입니다.
-        필요하다면 다음 문맥(context) 을 사용하여 질문(question) 에 상세하고 친절하게 답하세요. 만약, 주어진 문맥(context) 에서 답을 찾을 수 없다면, 아는 선에서 대답하되 없는 말을 꾸며내지 마세요.
+        """당신은 친절한 AI 어시스턴트입니다. 
+        당신의 임무는 당신의 지식을 활용하여, 주어진 문맥(context)을 참고해서 주어진 질문(question)에 답하는 것입니다.
+        다만, 주어진 문맥(context)에 대한 직접적인 언급을 하는 것이 아니고 내용을 참고해서 더 자세한 답변을 제공하는 것이 목표입니다.
 """
     "\n\n"
     "{context}"
