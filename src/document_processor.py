@@ -1,4 +1,5 @@
 import logging
+import streamlit as st
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.text_splitter import Language
 from langchain_community.document_loaders import PyPDFLoader
@@ -50,3 +51,20 @@ def process_document(source):
        return process_image(source)
    else:
        raise ValueError(f"Unsupported file type: {source}")
+   
+def show_chunk(documents):
+    st.write(f"10개만 출력합니다.")
+    for i, doc in enumerate(documents[:10]):
+        print(f"Document {i}:")
+        print(f"  Page Content: {doc.page_content[:100]}...")  # 첫 100자만 출력
+        print(f"  Metadata: {doc.metadata}")
+        print(f"  Page Content Type: {type(doc.page_content)}")
+        print(f"  Metadata Type: {type(doc.metadata)}")
+        print("-" * 40)
+
+        st.write(f"Document {i}:")
+        st.write(f"  Page Content: {doc.page_content[:100]}...")
+        st.write(f"  Metadata: {doc.metadata}")
+        st.write(f"  Page Content Type: {type(doc.page_content)}")
+        st.write(f"  Metadata: {type(doc.metadata)}")
+        st.write("-" * 40)

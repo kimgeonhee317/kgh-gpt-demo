@@ -4,9 +4,8 @@ import os
 import sys
 import getpass
 from dotenv import load_dotenv
-from src.document_processor import process_document
+from src.document_processor import process_document, show_chunk
 from src.rag_chain import create_rag_chain
-
 
 # check python version
 #st.write("Python executable being used:", sys.executable)
@@ -16,7 +15,7 @@ load_dotenv()
 langchain.verbose = True
 st.set_page_config(page_title="NAVER HCX003 챗봇 데모버전(RAG 등 테스트용)", page_icon="🤖")
 
-st.title("NAVER HCX003 챗봇 데모버전(RAG 등 테스트용)")
+st.title("NAVER HCX003 chatbot demo v0.1\n")
 
 # Initialize session state
 if "rag_chain" not in st.session_state:
@@ -25,42 +24,68 @@ if "rag_chain" not in st.session_state:
 # Sidebar for API key input
 with st.sidebar:
     studio_key = st.text_input("Enter your CLOVA STUDIO Key", type="password")
-    api_key = st.text_input("Enter your API Key", type="password")
-    if api_key:
+    gw_key = st.text_input("Enter your CLOVA GW Key", type="password")
+    embedding_id = st.text_input("Enter your embedding id", type="password")
+    segmentation_id = st.text_input("Enter your segmentation id", type="password")
+    if studio_key:
         os.environ["NCP_CLOVASTUDIO_API_KEY"] = studio_key
-        os.environ["NCP_APIGW_API_KEY"] = api_key
+    if gw_key:
+        os.environ["NCP_APIGW_API_KEY"] = gw_key
+    if embedding_id:
+        os.environ["NCP_CLOVASTUDIO_APP_ID"] = embedding_id
+    if segmentation_id:
+        os.environ["NCP_CLOVASTUDIO_APP_ID_SEGMENTATION"] = segmentation_id
+
+    st.write("== UPDATE LOG ==")
+    st.write("2021-11-13: demo version 0.1")
 
 # local
-studio_key = os.getenv("NCP_CLOVASTUDIO_API_KEY")
-gw_key = os.getenv("NCP_APIGW_API_KEY")
-api_key = os.getenv("OPENAI_API_KEY")
-print(studio_key, gw_key, api_key)
+if not studio_key:
+    studio_key = os.getenv("NCP_CLOVASTUDIO_API_KEY")
+if not gw_key:
+    gw_key = os.getenv("NCP_APIGW_API_KEY")
+if not embedding_id:
+    embedding_id = os.getenv("NCP_CLOVASTUDIO_APP_ID")
+if not segmentation_id:
+    segmentation_id = os.getenv("NCP_CLOVASTUDIO_APP_ID_SEGMENTATION")
+
+print(studio_key, gw_key, embedding_id, segmentation_id)
 
 # File uploader
-uploaded_file = st.file_uploader("Choose a file", type=["pdf", "png", "jpg", "jpeg"])
+uploaded_file = st.file_uploader("RAG 파이프라인 구축을 위한 파일을 선택해 주세요.", type=["pdf", "png", "jpg", "jpeg"])
 
 if uploaded_file is not None:
-    if st.button("Process File"):
-        if api_key:
-            with st.spinner("Processing file..."):
+    if st.button("벡터데이터베이스 생성 시작"):
+        if studio_key and gw_key and embedding_id and segmentation_id:
+            with st.spinner("벡터데이터베이스 생성 중입니다. 잠시만 기다려주세요..."):
                 # Save the uploaded file temporarily
                 with open(uploaded_file.name, "wb") as f:
                     f.write(uploaded_file.getbuffer())
-
                 try:
                     # Process the document
                     chunks = process_document(uploaded_file.name)
-                    # Create RAG chain
+                    print(chunks[0])
+                    show_chunk(chunks)
+                    #   Create RAG chain
                     st.session_state.rag_chain = create_rag_chain(chunks)
                     print(st.session_state.rag_chain)
-                    st.success("File processed successfully!")
+                    st.success("성공적으로 RAG 환경 구축이 완료되었습니다.")
                 except ValueError as e:
                     st.error(str(e))
                 finally:
                     # Remove the temporary file
                     os.remove(uploaded_file.name)
         else:
-            st.error("Please provide your OpenAI API key.")
+            if not studio_key:
+                st.error("Please provide your CLOVA STUDIO API key.")
+            elif not gw_key:
+                st.error("Please provide your CLOVA GW API key.")
+            elif not embedding_id:
+                st.error("Please provide your embedding id.")
+            elif not segmentation_id:
+                st.error("Please provide your segmentation id.")
+            else:
+                st.error("Please provide all the required API keys.")
 
 # Query input
 query = st.text_input("Ask a question about the uploaded document")
