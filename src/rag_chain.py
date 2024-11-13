@@ -42,8 +42,6 @@ def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
 
-
-
 def create_rag_chain(chunks):
 
     # 임베딩 모델 정의
@@ -80,31 +78,24 @@ def create_rag_chain(chunks):
             embeddings=[embeddings],
             metadatas=[doc.metadata]
         )
-        time.sleep(1.1)  # 이용량 제어를 고려한 1초 이상의 딜레이, 필요에 따라 조정 가능
+        time.sleep(0.1)  # 이용량 제어를 고려한 1초 이상의 딜레이, 필요에 따라 조정 가능
     
-    print("All documents have been added to the vectorstore.")
-
-
-    llm = ChatClovaX(
-        model="HCX-003",
-    )
-    # 2. Chroma 컬렉션에 쿼리 실행하여 유사한 문서 검색
-
-    
-    # 3. 유사도 검색 결과를 사용하여 리트리버 구성
-    similarity_retriever = vectorstore.as_retriever(
+    retriever = vectorstore.as_retriever(
         kwargs={"k": 5},
         search_type="similarity_score_threshold",
         search_kwargs={"score_threshold": 0.1, "k": 3}
     )
+    print("All documents have been added to the vectorstore.")
 
-    # 4. 검색된 문서를 RAG 체인에 연결하여 답변 생성
-    rag_chain_from_docs = RunnablePassthrough.assign(
-        context=lambda x: format_docs(x["context"])
-    ) | prompt | llm | StrOutputParser()
-    
-    rag_chain_with_source = RunnableParallel(
-        {"context": similarity_retriever, "question": RunnablePassthrough()}
-    ).assign(answer=rag_chain_from_docs)
-    
-    pprint(rag_chain_with_source)
+    llm = ChatClovaX(
+        model="HCX-003",
+    )
+
+    rag_chain = (
+        {"context": retriever, "question": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+
+    return rag_chain
