@@ -24,13 +24,13 @@ api_key = os.getenv("OPENAI_API_KEY")
 
 system_prompt = (
         """당신은 친절한 AI 어시스턴트입니다. 
-        주어진 질문(question)에 최대한 상세하고 친절하게 답해주세요. 
+        사용자의 질문에 최대한 상세하고 친절하게 답해주세요. 
         필요할 경우에만 주어진 문맥(context)을 활용해서 답변을 만들어주세요. 
         이 경우, 주어진 문맥(context)의 메타데이터(metadata)를 활용하여 출처를 명확하게 하세요.
-        만약 필요하지 않을 경우 문맥을 무시하고 질문에만 집중해주세요 (문맥에 대한 언급도 하지 말아주세요).
+        만약 필요하지 않을 경우 주어진 문맥을 무시하고 질문에만 집중해주세요 (주어진 문맥에 대한 언급도 하지 말아주세요).
         """
     "\n\n"
-    "{context}"
+    "주어진 문맥(context): {context}"
 )
  
 prompt = ChatPromptTemplate.from_messages(
