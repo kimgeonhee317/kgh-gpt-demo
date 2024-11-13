@@ -23,8 +23,9 @@ load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 
 system_prompt = (
-        """당신은 질문-답변(Question-Answering)을 수행하는 친절한 AI 어시스턴트입니다. 당신의 임무는 원래 가지고있는 지식은 모두 배제하고, 주어진 문맥(context) 에서 주어진 질문(question) 에 답하는 것입니다.
-검색된 다음 문맥(context) 을 사용하여 질문(question) 에 답하세요. 만약, 주어진 문맥(context) 에서 답을 찾을 수 없다면, 답을 모른다면 `주어진 정보에서 질문에 대한 정보를 찾을 수 없습니다` 라고 답하세요.
+        """당신은 질문-답변(Question-Answering)을 수행하는 친절한 AI 어시스턴트입니다. 
+        당신의 임무는 당신의 지식을 활용하여, 주어진 문맥(context) 에서 주어진 질문(question) 에 답하는 것입니다.
+        필요하다면 다음 문맥(context) 을 사용하여 질문(question) 에 상세하고 친절하게 답하세요. 만약, 주어진 문맥(context) 에서 답을 찾을 수 없다면, 아는 선에서 대답하되 없는 말을 꾸며내지 마세요.
 """
     "\n\n"
     "{context}"
@@ -89,6 +90,9 @@ def create_rag_chain(chunks):
 
     llm = ChatClovaX(
         model="HCX-003",
+        maxTokens = 2048,
+        temperature= 0.5,
+        repeatPenalty = 5
     )
 
     rag_chain = (
