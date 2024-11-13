@@ -1,8 +1,10 @@
 langchain==0.2.17
-langchain_core==0.2.43
+langchain-core==0.2.43
+langchain-chroma ==0.1.4
 python-dotenv==1.0.1
 streamlit==1.37.1
 sentence-transformers == 3.2.1
-langchain_community==0.2.19
+langchain-community==0.2.19
+chromadb == 0.5.18
 faiss-cpu
 pypdf
