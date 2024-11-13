@@ -44,17 +44,17 @@ with st.sidebar:
     st.write("== UPDATE LOG ==")
     st.write("2021-11-13: demo version 0.1")
 
-# local
-if not studio_key:
-    studio_key = os.getenv("NCP_CLOVASTUDIO_API_KEY")
-if not gw_key:
-    gw_key = os.getenv("NCP_APIGW_API_KEY")
-if not embedding_id:
-    embedding_id = os.getenv("NCP_CLOVASTUDIO_APP_ID")
-if not segmentation_id:
-    segmentation_id = os.getenv("NCP_CLOVASTUDIO_APP_ID_SEGMENTATION")
+# # local
+# if not studio_key:
+#     studio_key = os.getenv("NCP_CLOVASTUDIO_API_KEY")
+# if not gw_key:
+#     gw_key = os.getenv("NCP_APIGW_API_KEY")
+# if not embedding_id:
+#     embedding_id = os.getenv("NCP_CLOVASTUDIO_APP_ID")
+# if not segmentation_id:
+#     segmentation_id = os.getenv("NCP_CLOVASTUDIO_APP_ID_SEGMENTATION")
 
-print(studio_key, gw_key, embedding_id, segmentation_id)
+#print(studio_key, gw_key, embedding_id, segmentation_id)
 
 # File uploader
 uploaded_file = st.file_uploader("RAG 파이프라인 구축을 위한 파일을 선택해 주세요.", type=["pdf", "png", "jpg", "jpeg"])
