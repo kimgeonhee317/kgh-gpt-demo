@@ -6,7 +6,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings, ClovaXEmbeddings
 from langchain_community.chat_models import ChatClovaX
 
 # Load the API key from env variables
@@ -46,8 +46,10 @@ def format_docs_and_capture_context(docs):
 
 def create_rag_chain(chunks):
 
-    model_name = "./embedding/bge-m3"
-    hf_embeddings = HuggingFaceEmbeddings(model_name=model_name)
+    #model_name = "./embedding/bge-m3"
+    #hf_embeddings = HuggingFaceEmbeddings(model_name=model_name)
+
+    clovax_embeddings = ClovaXEmbeddings(model='bge-m3')
 
     #embeddings = OpenAIEmbeddings(api_key=api_key)
     doc_search = FAISS.from_documents(chunks, hf_embeddings)

@@ -16,7 +16,7 @@ load_dotenv()
 langchain.verbose = True
 st.set_page_config(page_title="NAVER HCX003 챗봇 데모버전(RAG 등 테스트용)", page_icon="🤖")
 
-st.title("Test Chatbot")
+st.title("NAVER HCX003 챗봇 데모버전(RAG 등 테스트용)")
 
 # Initialize session state
 if "rag_chain" not in st.session_state:
