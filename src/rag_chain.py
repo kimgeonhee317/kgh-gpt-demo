@@ -19,7 +19,7 @@ from uuid import uuid4
  
 # Load the API key from env variables
 load_dotenv()
-
+chromadb.api.client.SharedSystemClient.clear_system_cache()
 api_key = os.getenv("OPENAI_API_KEY")
 
 system_prompt = (
