@@ -102,6 +102,7 @@ if st.button("Ask"):
 
             st.subheader("Answer:")
             st.write(result)
+            query = ""
     elif not st.session_state.rag_chain:
         st.error("Please upload and process a file first.")
     else:
