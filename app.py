@@ -93,17 +93,17 @@ if uploaded_file is not None:
                 st.error("Please provide all the required API keys.")
 
 # Query input
-query = st.text_input("Ask a question about the uploaded document")
+query = st.text_input("챗봇에게 질의하세요. (아직 히스토리 기능 미구현')")
 
-if st.button("Ask"):
+if st.button("질의"):
     if st.session_state.rag_chain and query:
-        with st.spinner("Generating answer..."):
+        with st.spinner("답변 생성 중..."):
             result = st.session_state.rag_chain.invoke(query)
 
-            st.subheader("Answer:")
+            st.subheader("답변:")
             st.write(result)
             query = ""
     elif not st.session_state.rag_chain:
-        st.error("Please upload and process a file first.")
+        st.error("파일을 생성해서 RAG를 먼저 구축하세요.")
     else:
-        st.error("Please enter a question.")
+        st.error("질의문이 필요합니다.")
