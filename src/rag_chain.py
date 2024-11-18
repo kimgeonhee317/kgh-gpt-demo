@@ -13,26 +13,26 @@ from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_core.prompts import ChatPromptTemplate
 from pprint import pprint
 from langchain.schema.runnable import RunnableParallel
+from pydantic import ConfigDict
 import time
 import uuid
 from uuid import uuid4
- 
+
+
 # Load the API key from env variables
 load_dotenv()
 chromadb.api.client.SharedSystemClient.clear_system_cache()
-api_key = os.getenv("OPENAI_API_KEY")
-
 system_prompt = (
         """당신은 친절한 AI 어시스턴트입니다. 
         사용자의 질문에 최대한 상세하고 친절하게 답해주세요. 
         필요할 경우에만 주어진 문맥(context)을 활용해서 답변을 만들어주세요. 
         이 경우, 주어진 문맥(context)의 메타데이터(metadata)를 활용하여 출처를 명확하게 하세요.
         만약 필요하지 않을 경우 주어진 문맥을 무시하고 질문에만 집중해주세요 (주어진 문맥에 대한 언급도 하지 말아주세요).
+        \n\n
+        주어진 문맥(context): {context}
         """
-    "\n\n"
-    "주어진 문맥(context): {context}"
 )
- 
+print(f"system_prompt:{system_prompt}")
 prompt = ChatPromptTemplate.from_messages(
     [
         ("system", system_prompt),
@@ -49,7 +49,8 @@ def create_rag_chain(chunks):
 
     # 임베딩 모델 정의
     clovax_embeddings = ClovaXEmbeddings(model='bge-m3')
-    
+    ClovaXEmbeddings.Config.protected_namespaces = ()
+
     # 로컬 클라이언트 경로 지정
     client = chromadb.PersistentClient(path="./chroma_langchain_db") #저장할 로컬 경로
     
