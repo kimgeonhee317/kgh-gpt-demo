@@ -11,104 +11,60 @@ from dotenv import load_dotenv
 #from src.document_processor import process_document, show_chunk
 from src.document_segmentation import process_document, show_chunk
 from src.rag_chain import create_rag_chain
+from src.session_management import load_session, delete_session, save_session
+from src.default_UI import show_default_UI
+from src.onboarding import execute_onboarding
+from src.chatbot_UI import show_chatbot_UI
+from src.rag_management_UI import show_ragmgmt_UI
 
-import warnings
-# Suppress specific UserWarnings related to ClovaXEmbeddings
-warnings.filterwarnings("ignore", message="Field \"model_name\" in ClovaXEmbeddings has conflict with protected namespace \"model_\".")
+def main():
+    # Load environment variables
+    load_dotenv()
+    langchain.verbose = True
+    st.set_page_config(page_title="NAVER HCX003 챗봇 데모버전(RAG 등 테스트용)", page_icon="🤖")
+    st.title("NAVER HCX003 chatbot demo v0.1\n")
 
-# check python version
-#st.write("Python executable being used:", sys.executable)
+    # Sidebar for API key input management and update log
+    with st.sidebar:
+        st.sidebar.title('kgh-gpt-test')
+        studio_key = st.text_input("Enter your CLOVA STUDIO Key", type="password")
+        gw_key = st.text_input("Enter your CLOVA GW Key", type="password")
+        embedding_id = st.text_input("Enter your embedding id", type="password")
+        segmentation_id = st.text_input("Enter your segmentation id", type="password")
+        if studio_key:
+            os.environ["NCP_CLOVASTUDIO_API_KEY"] = studio_key
+        if gw_key:
+            os.environ["NCP_APIGW_API_KEY"] = gw_key
+        if embedding_id:
+            os.environ["NCP_CLOVASTUDIO_APP_ID"] = embedding_id
+        if segmentation_id:
+            os.environ["NCP_CLOVASTUDIO_APP_ID_SEGMENTATION"] = segmentation_id
 
-# Load environment variables
-load_dotenv()
-langchain.verbose = True
-st.set_page_config(page_title="NAVER HCX003 챗봇 데모버전(RAG 등 테스트용)", page_icon="🤖")
+        st.write("== UPDATE LOG ==")
+        st.write("2021-11-13: demo version 0.1")
+        st.write("2021-11-18: add HCX segmentator to the pipeline")
 
-st.title("NAVER HCX003 chatbot demo v0.1\n")
+    # (!) only for the local
+    if not studio_key:
+        studio_key = os.getenv("NCP_CLOVASTUDIO_API_KEY")
+    if not gw_key:
+        gw_key = os.getenv("NCP_APIGW_API_KEY")
+    if not embedding_id:
+        embedding_id = os.getenv("NCP_CLOVASTUDIO_APP_ID")
+    if not segmentation_id:
+        segmentation_id = os.getenv("NCP_CLOVASTUDIO_APP_ID_SEGMENTATION")
+    print(studio_key, gw_key, embedding_id, segmentation_id)
 
-# Initialize session state
-if "rag_chain" not in st.session_state:
-    st.session_state.rag_chain = None
+    # Session Routing
+    #st.write(load_session(st.session_state))
+    if not load_session(st.session_state):
+        execute_onboarding()
+    elif "rag_pipeline" not in st.session_state and "run_chatbot" not in st.session_state:
+        show_default_UI()
+    elif "rag_pipeline" in st.session_state:
+        show_ragmgmt_UI()
+    elif "run_chatbot" in st.session_state:
+        show_chatbot_UI()
 
-# Sidebar for API key input
-with st.sidebar:
-    studio_key = st.text_input("Enter your CLOVA STUDIO Key", type="password")
-    gw_key = st.text_input("Enter your CLOVA GW Key", type="password")
-    embedding_id = st.text_input("Enter your embedding id", type="password")
-    segmentation_id = st.text_input("Enter your segmentation id", type="password")
-    if studio_key:
-        os.environ["NCP_CLOVASTUDIO_API_KEY"] = studio_key
-    if gw_key:
-        os.environ["NCP_APIGW_API_KEY"] = gw_key
-    if embedding_id:
-        os.environ["NCP_CLOVASTUDIO_APP_ID"] = embedding_id
-    if segmentation_id:
-        os.environ["NCP_CLOVASTUDIO_APP_ID_SEGMENTATION"] = segmentation_id
-
-    st.write("== UPDATE LOG ==")
-    st.write("2021-11-13: demo version 0.1")
-    st.write("2021-11-18: add HCX segmentator to the pipeline")
-
-# local
-if not studio_key:
-    studio_key = os.getenv("NCP_CLOVASTUDIO_API_KEY")
-if not gw_key:
-    gw_key = os.getenv("NCP_APIGW_API_KEY")
-if not embedding_id:
-    embedding_id = os.getenv("NCP_CLOVASTUDIO_APP_ID")
-if not segmentation_id:
-    segmentation_id = os.getenv("NCP_CLOVASTUDIO_APP_ID_SEGMENTATION")
-
-print(studio_key, gw_key, embedding_id, segmentation_id)
-
-# File uploader
-uploaded_file = st.file_uploader("RAG 파이프라인 구축을 위한 파일을 선택해 주세요.", type=["pdf", "png", "jpg", "jpeg"])
-
-if uploaded_file is not None:
-    if st.button("벡터데이터베이스 생성 시작"):
-        if studio_key and gw_key and embedding_id and segmentation_id:
-            with st.spinner("벡터데이터베이스 생성 중입니다. 잠시만 기다려주세요..."):
-                # Save the uploaded file temporarily
-                with open(uploaded_file.name, "wb") as f:
-                    f.write(uploaded_file.getbuffer())
-                try:
-                    # Process the document
-                    chunks = process_document(uploaded_file.name)
-                    #print(chunks)
-                    show_chunk(chunks)
-                    #   Create RAG chain
-                    st.session_state.rag_chain = create_rag_chain(chunks)
-                    print(st.session_state.rag_chain)
-                    st.success("성공적으로 RAG 환경 구축이 완료되었습니다.")
-                except ValueError as e:
-                    st.error(str(e))
-                finally:
-                    # Remove the temporary file
-                    os.remove(uploaded_file.name)
-        else:
-            if not studio_key:
-                st.error("Please provide your CLOVA STUDIO API key.")
-            elif not gw_key:
-                st.error("Please provide your CLOVA GW API key.")
-            elif not embedding_id:
-                st.error("Please provide your embedding id.")
-            elif not segmentation_id:
-                st.error("Please provide your segmentation id.")
-            else:
-                st.error("Please provide all the required API keys.")
-
-# Query input
-query = st.text_input("챗봇에게 질의하세요. (아직 히스토리 기능 미구현')")
-
-if st.button("질의"):
-    if st.session_state.rag_chain and query:
-        with st.spinner("답변 생성 중..."):
-            result = st.session_state.rag_chain.invoke(query)
-
-            st.subheader("답변:")
-            st.write(result)
-            query = ""
-    elif not st.session_state.rag_chain:
-        st.error("파일을 생성해서 RAG를 먼저 구축하세요.")
-    else:
-        st.error("질의문이 필요합니다.")
+if __name__ == "__main__":
+    main()

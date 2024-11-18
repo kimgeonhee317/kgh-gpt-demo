@@ -8,7 +8,6 @@ from langchain_community.document_loaders.parsers.pdf import (
 )
 from langchain.schema import Document
 
-
 def process_pdf(source):
    loader = PyPDFLoader(source)
    documents = loader.load()

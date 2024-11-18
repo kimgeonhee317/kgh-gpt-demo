@@ -17,35 +17,26 @@ from pydantic import ConfigDict
 import time
 import uuid
 from uuid import uuid4
+import streamlit as st
 
 
 # Load the API key from env variables
 load_dotenv()
 chromadb.api.client.SharedSystemClient.clear_system_cache()
-system_prompt = (
-        """당신은 친절한 AI 어시스턴트입니다. 
-        사용자의 질문에 최대한 상세하고 친절하게 답해주세요. 
-        필요할 경우에만 주어진 문맥(context)을 활용해서 답변을 만들어주세요. 
-        이 경우, 주어진 문맥(context)의 메타데이터(metadata)를 활용하여 출처를 명확하게 하세요.
-        만약 필요하지 않을 경우 주어진 문맥을 무시하고 질문에만 집중해주세요 (주어진 문맥에 대한 언급도 하지 말아주세요).
-        \n\n
-        주어진 문맥(context): {context}
-        """
-)
-print(f"system_prompt:{system_prompt}")
-prompt = ChatPromptTemplate.from_messages(
-    [
-        ("system", system_prompt),
-        ("human", "{question}"),
-    ]
-)
+
 
 # This function is used to format(concatenate) the page content of the documents
 def format_docs(docs): 
     return "\n\n".join(doc.page_content for doc in docs)
 
-
 def create_rag_chain(chunks):
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", st.session_state.system_prompt),
+            ("human", "{question}"),
+        ]
+    )
 
     # 임베딩 모델 정의
     clovax_embeddings = ClovaXEmbeddings(model='bge-m3')
@@ -82,7 +73,7 @@ def create_rag_chain(chunks):
             embeddings=[embeddings],
             metadatas=[doc.metadata]
         )
-        time.sleep(0.1)  # 이용량 제어를 고려한 1초 이상의 딜레이, 필요에 따라 조정 가능
+        time.sleep(1.1)  # 이용량 제어를 고려한 1초 이상의 딜레이, 필요에 따라 조정 가능
     
     retriever = vectorstore.as_retriever(
         kwargs={"k": 5},

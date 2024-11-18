@@ -3,6 +3,8 @@ venv/
 embedding/
 chroma_langchain_db/*
 __pycache__/
+session_data/
+ingestion_data/
 .env
 *.pdf
 *.png
