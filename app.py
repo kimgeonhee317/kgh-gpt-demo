@@ -43,6 +43,7 @@ def main():
         st.write("== UPDATE LOG ==")
         st.write("2021-11-13: demo version 0.1")
         st.write("2021-11-18: add HCX segmentator to the pipeline")
+        st.write("2021-11-19: add Session management")
 
     # (!) only for the local
     if not studio_key:
@@ -55,15 +56,25 @@ def main():
         segmentation_id = os.getenv("NCP_CLOVASTUDIO_APP_ID_SEGMENTATION")
     print(studio_key, gw_key, embedding_id, segmentation_id)
 
+    if not studio_key or not gw_key or not embedding_id or not segmentation_id:
+        st.warning("API 키를 입력해주세요.")
+        return
+    
+    # Session Setup
+    if "rag_pipeline" not in st.session_state:
+        st.session_state.rag_pipeline = False
+    if "run_chatbot" not in st.session_state:
+        st.session_state.run_chatbot = False
+
     # Session Routing
     #st.write(load_session(st.session_state))
     if not load_session(st.session_state):
         execute_onboarding()
-    elif "rag_pipeline" not in st.session_state and "run_chatbot" not in st.session_state:
+    elif st.session_state['rag_pipeline'] == False and st.session_state['run_chatbot'] == False:
         show_default_UI()
-    elif "rag_pipeline" in st.session_state:
+    elif st.session_state['rag_pipeline']:
         show_ragmgmt_UI()
-    elif "run_chatbot" in st.session_state:
+    elif st.session_state['run_chatbot']:
         show_chatbot_UI()
 
 if __name__ == "__main__":
