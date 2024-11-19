@@ -85,7 +85,7 @@ def process_pdf(source):
             "All pages in the PDF appear to be scanned. Please use a PDF with text content."
         )
     
-    return split_documents(unscanned_documents)
+    return segment_documents(unscanned_documents)
 
 def process_image(source):
    # Extract text from image using OCR
@@ -105,14 +105,15 @@ def split_documents(documents):
 
 
 def segment_documents(documents):
-    print(documents)
+    # Initialize the segmentation executor
     segmentation_executor = SegmentationExecutor(
         host="clovastudio.apigw.ntruss.com"
     )
 
     chunked_data = []
 
-    for data in tqdm(clovastudiodatas_flattened):
+    for data in tqdm(documents):
+        print(data)
         try:
             request_data = {
                 "postProcessMaxSize": 100,
@@ -127,20 +128,21 @@ def segment_documents(documents):
             result_data = [' '.join(segment) for segment in response_data]
       
             for paragraph in result_data:
-                chunked_document = {
-                    "metadata": data.metadata["source"],
-                    "page_content": paragraph
-                }
+                # Create a Document object for each segmented paragraph
+                chunked_document = Document(
+                    metadata={"source": data.metadata["source"]},
+                    page_content=paragraph
+                )
                 chunked_data.append(chunked_document)
       
         except Exception as e:
             print(f"Error processing data from {data.metadata['source']}: {e}")
-            # 오류 발생 시 현재 반복을 건너뛰고 다음으로 진행
+            # Skip this document and continue with the next
             continue
    
     print(len(chunked_data))
     
-    return segment_documents(documents)
+    return chunked_data
 
 
 def process_document(source):

@@ -24,10 +24,58 @@ import streamlit as st
 load_dotenv()
 chromadb.api.client.SharedSystemClient.clear_system_cache()
 
-
 # This function is used to format(concatenate) the page content of the documents
 def format_docs(docs): 
     return "\n\n".join(doc.page_content for doc in docs)
+
+def get_rag_chain():
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", st.session_state.system_prompt),
+            ("human", "{question}"),
+        ]
+    )
+    # 임베딩 모델 정의
+    clovax_embeddings = ClovaXEmbeddings(model='bge-m3')
+    ClovaXEmbeddings.Config.protected_namespaces = ()
+
+    # 로컬 클라이언트 경로 지정
+    client = chromadb.PersistentClient(path="./chroma_langchain_db") # 저장할 로컬 경로
+    
+    # Chroma 벡터 저장소 생성 (기존 컬렉션에 연결)
+    vectorstore = Chroma(
+        client=client,
+        collection_name="clovastudiodatas_docs",
+        embedding_function=clovax_embeddings
+    )
+    
+    # Chroma retriever 생성 (기존 벡터 저장소를 이용한 검색)
+    retriever = vectorstore.as_retriever(
+        kwargs={"k": 5},
+        search_type="similarity_score_threshold",
+        search_kwargs={"score_threshold": 0.5, "k": 3}
+    )
+    print("Vectorstore is now accessible for retrieval only.")
+
+    # Define the LLM
+    llm = ChatClovaX(
+        model="HCX-003",
+        max_tokens=2048,
+        temperature=0.5,
+        repeat_penalty=5
+    )
+
+    # Define the RAG chain
+    rag_chain = (
+        {"context": retriever, "question": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+
+    return rag_chain
+
 
 def create_rag_chain(chunks):
 
@@ -78,7 +126,7 @@ def create_rag_chain(chunks):
     retriever = vectorstore.as_retriever(
         kwargs={"k": 5},
         search_type="similarity_score_threshold",
-        search_kwargs={"score_threshold": 0.1, "k": 3}
+        search_kwargs={"score_threshold": 0.5, "k": 3}
     )
     print("All documents have been added to the vectorstore.")
 

@@ -21,7 +21,7 @@ def main():
     # Load environment variables
     load_dotenv()
     langchain.verbose = True
-    st.set_page_config(page_title="NAVER HCX003 챗봇 데모버전(RAG 등 테스트용)", page_icon="🤖")
+    st.set_page_config(page_title="NAVER HCX003 챗봇 데모버전(RAG 등 테스트용)", page_icon="🤖", layout="wide")
     st.title("NAVER HCX003 chatbot demo v0.1\n")
 
     # Sidebar for API key input management and update log
@@ -43,7 +43,7 @@ def main():
         st.write("== UPDATE LOG ==")
         st.write("2021-11-13: demo version 0.1")
         st.write("2021-11-18: add HCX segmentator to the pipeline")
-        st.write("2021-11-19: add Session management")
+        st.write("2021-11-19: add Session management, multi-turn RAG chatbot")
 
     # (!) only for the local
     if not studio_key:
@@ -54,28 +54,35 @@ def main():
         embedding_id = os.getenv("NCP_CLOVASTUDIO_APP_ID")
     if not segmentation_id:
         segmentation_id = os.getenv("NCP_CLOVASTUDIO_APP_ID_SEGMENTATION")
-    print(studio_key, gw_key, embedding_id, segmentation_id)
+    #print(studio_key, gw_key, embedding_id, segmentation_id)
 
     if not studio_key or not gw_key or not embedding_id or not segmentation_id:
         st.warning("API 키를 입력해주세요.")
         return
     
-    # Session Setup
+    # Session Setup    
+    if "user_name" not in st.session_state:
+        if load_session(st.session_state):
+            st.rerun()
+        else:
+            st.session_state.user_name = None
     if "rag_pipeline" not in st.session_state:
         st.session_state.rag_pipeline = False
     if "run_chatbot" not in st.session_state:
         st.session_state.run_chatbot = False
-
+   # Initialize rag chain
+    if "rag_chain" not in st.session_state:
+        st.session_state.rag_chain = None
+    
     # Session Routing
-    #st.write(load_session(st.session_state))
-    if not load_session(st.session_state):
+    if st.session_state.user_name is None:
         execute_onboarding()
-    elif st.session_state['rag_pipeline'] == False and st.session_state['run_chatbot'] == False:
-        show_default_UI()
-    elif st.session_state['rag_pipeline']:
+    elif st.session_state['rag_pipeline'] == True:
         show_ragmgmt_UI()
-    elif st.session_state['run_chatbot']:
+    elif st.session_state['run_chatbot'] == True:
         show_chatbot_UI()
+    else: 
+        show_default_UI()
 
 if __name__ == "__main__":
     main()
