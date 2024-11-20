@@ -18,10 +18,10 @@ def show_ragmgmt_UI():
     st.write("(참고) 현재 벡터데이터베이스에 저장된 자료는 다음과 같습니다.")
     get_embedded_documents()
 
-    if st.button("DB 초기화"):
-        st.write("벡터데이터베이스를 초기화합니다.")
-        delete_documents()
-        st.write("벡터데이터베이스 초기화 완료.")
+    # if st.button("DB 초기화"):
+    #     st.write("벡터데이터베이스를 초기화합니다.")
+    #     delete_documents()
+    #     st.write("벡터데이터베이스 초기화 완료.")
 
     st.write("---"*40)
 

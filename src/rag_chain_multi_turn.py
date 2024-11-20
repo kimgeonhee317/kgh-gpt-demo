@@ -2,6 +2,7 @@ import os
 from tqdm import tqdm
 from dotenv import load_dotenv
 import chromadb
+from chromadb.config import Settings
 from langchain_chroma import Chroma
 from langchain.prompts import PromptTemplate
 from langchain_community.vectorstores import FAISS
@@ -32,8 +33,6 @@ def add_message(role, content):
     st.session_state.messages.append((role, content))
 
 def get_rag_chain():
-
-
     if "messages" not in st.session_state:
         st.session_state.messages = [
             ("system", st.session_state.system_prompt)  # Initial system message
@@ -46,7 +45,7 @@ def get_rag_chain():
     ClovaXEmbeddings.Config.protected_namespaces = ()
 
     # 로컬 클라이언트 경로 지정
-    client = chromadb.PersistentClient(path="./chroma_langchain_db") # 저장할 로컬 경로
+    client = chromadb.PersistentClient(path="./chroma_langchain_db", settings=Settings(anonymized_telemetry=False)) # 저장할 로컬 경로
     
     # Chroma 벡터 저장소 생성 (기존 컬렉션에 연결)
     vectorstore = Chroma(

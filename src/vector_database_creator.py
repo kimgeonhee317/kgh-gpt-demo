@@ -4,6 +4,7 @@ import time
 import streamlit as st
 from dotenv import load_dotenv
 import chromadb
+from chromadb.config import Settings
 from tqdm import tqdm
 from langchain_community.embeddings import ClovaXEmbeddings
 
@@ -17,7 +18,7 @@ def create_vector_database(chunks):
     ClovaXEmbeddings.Config.protected_namespaces = ()
 
     # Specify local client path
-    client = chromadb.PersistentClient(path="./chroma_langchain_db")
+    client = chromadb.PersistentClient(path="./chroma_langchain_db", settings=Settings(anonymized_telemetry=False))
 
     # Create Chroma collection
     chroma_collection = client.get_or_create_collection(

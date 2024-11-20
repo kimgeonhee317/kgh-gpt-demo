@@ -1,5 +1,6 @@
 import streamlit as st
 import chromadb
+from chromadb.config import Settings
 import os
 from src.global_settings import DB_PATH
 from langchain_chroma import Chroma
@@ -12,7 +13,7 @@ def get_embedded_documents():
         st.warning("벡터 데이터베이스 파일이 존재하지 않습니다.")
         return
 
-    client = chromadb.PersistentClient(path="./chroma_langchain_db")
+    client = chromadb.PersistentClient(path="./chroma_langchain_db", settings=Settings(anonymized_telemetry=False))
 
     # Access the existing collection
     collection_name = "clovastudiodatas_docs"
