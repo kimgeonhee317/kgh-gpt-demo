@@ -47,14 +47,14 @@ def main():
         st.write("2021-11-20: demo v0.2: present RAG retrieved source for each turn")
 
     # (!) only for the local
-    # if not studio_key:
-    #     studio_key = os.getenv("NCP_CLOVASTUDIO_API_KEY")
-    # if not gw_key:
-    #     gw_key = os.getenv("NCP_APIGW_API_KEY")
-    # if not embedding_id:
-    #     embedding_id = os.getenv("NCP_CLOVASTUDIO_APP_ID")
-    # if not segmentation_id:
-    #     segmentation_id = os.getenv("NCP_CLOVASTUDIO_APP_ID_SEGMENTATION")
+    if not studio_key:
+        studio_key = os.getenv("NCP_CLOVASTUDIO_API_KEY")
+    if not gw_key:
+        gw_key = os.getenv("NCP_APIGW_API_KEY")
+    if not embedding_id:
+        embedding_id = os.getenv("NCP_CLOVASTUDIO_APP_ID")
+    if not segmentation_id:
+        segmentation_id = os.getenv("NCP_CLOVASTUDIO_APP_ID_SEGMENTATION")
     #print(studio_key, gw_key, embedding_id, segmentation_id)
 
     if not studio_key or not gw_key or not embedding_id or not segmentation_id:

@@ -42,7 +42,7 @@ def get_embedded_documents():
     if documents:
         for idx, doc_info in enumerate(documents):
             st.write(f"**Document {idx + 1}:**", doc_info["Metadata"].get("source", "Unknown"))
-            st.write("**내용 예시:**", doc_info["Content"])
+            #st.write("**내용 예시:**", doc_info["Content"])
     else:
         st.write("No documents found in the collection.")
 

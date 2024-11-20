@@ -33,16 +33,10 @@ def show_ragmgmt_UI():
             """)
     if 'system_prompt' not in st.session_state:
         st.session_state['system_prompt'] = default_prompt
-        
-    user_prompt = st.text_area("(1) 기본 시스템 프롬프트 설정 (RAG를 통해 주입될 추가 정보는 \{context\}로 표현):", value=st.session_state.system_prompt, height=400)
-    if st.button("변경"):
-        st.session_state.system_prompt = user_prompt
-        # complete
-        st.success("시스템 프롬프트가 변경되었습니다.")
-
+    
 
     # File uploader
-    uploaded_files = st.file_uploader("(2) 벡터데이터베이스 구축을 위한 파일을 선택해 주세요.", type=["pdf", "png", "jpg", "jpeg"], accept_multiple_files=True)
+    uploaded_files = st.file_uploader("벡터데이터베이스 구축을 위한 파일을 선택해 주세요.", type=["pdf", "png", "jpg", "jpeg"], accept_multiple_files=True)
     finish_upload = st.button('업로드 및 파이프라인 구축 시작')
 
     if uploaded_files and finish_upload:
