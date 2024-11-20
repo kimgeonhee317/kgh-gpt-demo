@@ -79,6 +79,7 @@ def show_chatbot_UI():
     if st.button("대화 초기화"):
         st.session_state.responses = []
         st.session_state.messages = [("system", st.session_state.system_prompt)]
+        st.session_state.urls = []
         st.rerun()
     st.write('---')
     if st.button("기본 화면으로"):
