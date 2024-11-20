@@ -22,7 +22,7 @@ def main():
     load_dotenv()
     langchain.verbose = True
     st.set_page_config(page_title="NAVER HCX003 챗봇 데모버전(RAG 등 테스트용)", page_icon="🤖", layout="wide")
-    st.title("NAVER HCX003 chatbot demo v0.1\n")
+    st.title("NAVER HCX003 chatbot demo v0.2\n")
 
     # Sidebar for API key input management and update log
     with st.sidebar:
@@ -41,19 +41,20 @@ def main():
             os.environ["NCP_CLOVASTUDIO_APP_ID_SEGMENTATION"] = segmentation_id
 
         st.write("== UPDATE LOG ==")
-        st.write("2021-11-13: demo version 0.1")
+        st.write("2021-11-13: initial version")
         st.write("2021-11-18: add HCX segmentator to the pipeline")
         st.write("2021-11-19: add Session management, multi-turn RAG chatbot")
+        st.write("2021-11-20: demo v0.2: present RAG retrieved source for each turn")
 
     # (!) only for the local
-    if not studio_key:
-        studio_key = os.getenv("NCP_CLOVASTUDIO_API_KEY")
-    if not gw_key:
-        gw_key = os.getenv("NCP_APIGW_API_KEY")
-    if not embedding_id:
-        embedding_id = os.getenv("NCP_CLOVASTUDIO_APP_ID")
-    if not segmentation_id:
-        segmentation_id = os.getenv("NCP_CLOVASTUDIO_APP_ID_SEGMENTATION")
+    # if not studio_key:
+    #     studio_key = os.getenv("NCP_CLOVASTUDIO_API_KEY")
+    # if not gw_key:
+    #     gw_key = os.getenv("NCP_APIGW_API_KEY")
+    # if not embedding_id:
+    #     embedding_id = os.getenv("NCP_CLOVASTUDIO_APP_ID")
+    # if not segmentation_id:
+    #     segmentation_id = os.getenv("NCP_CLOVASTUDIO_APP_ID_SEGMENTATION")
     #print(studio_key, gw_key, embedding_id, segmentation_id)
 
     if not studio_key or not gw_key or not embedding_id or not segmentation_id:

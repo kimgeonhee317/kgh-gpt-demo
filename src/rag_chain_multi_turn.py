@@ -62,6 +62,7 @@ def get_rag_chain():
     )
     print("Vectorstore is now accessible for retrieval only.")
 
+    
     # Define the LLM
     llm = ChatClovaX(
         model="HCX-003",
@@ -71,11 +72,15 @@ def get_rag_chain():
     )
 
     # Define the RAG chain
-    rag_chain = (
-        {"context": retriever, "question": RunnablePassthrough()}
+    rag_chain_from_docs = (
+        RunnablePassthrough.assign(context=(lambda x: format_docs(x["context"])))
         | prompt
         | llm
         | StrOutputParser()
     )
 
-    return rag_chain
+    rag_chain_with_source = RunnableParallel(
+        {"context": retriever, "question": RunnablePassthrough()}
+    ).assign(answer=rag_chain_from_docs)
+
+    return rag_chain_with_source
