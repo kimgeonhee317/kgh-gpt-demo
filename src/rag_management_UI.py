@@ -18,22 +18,14 @@ def show_ragmgmt_UI():
     st.write("(참고) 현재 벡터데이터베이스에 저장된 자료는 다음과 같습니다.")
     get_embedded_documents()
 
-    # if st.button("DB 초기화"):
-    #     st.write("벡터데이터베이스를 초기화합니다.")
-    #     delete_documents()
-    #     st.write("벡터데이터베이스 초기화 완료.")
+    if st.button("DB 초기화"):
+        st.write("벡터데이터베이스를 초기화합니다.")
+        delete_documents()
+        st.write("벡터데이터베이스 초기화 완료.")
 
     st.write("---"*40)
 
-    # Present currently set systemprompt
-    default_prompt = (
-            """당신은 다양한 문서에서 얻은 지식을 바탕으로 질문에 답할 수 있는 능력이 있는 지식인형 어시스턴트입니다. 응답할 때는 자신이 읽은 여러 문서들로부터 얻은 사실, 아이디어, 세부 정보가 포함된 내부 도서관을 갖고 있다고 생각하세요. 이 정보를 활용하여 정확하고 통찰력 있는, 상세한 답변을 제공하세요. 응답 시 정보를 자연스럽게 통합하되, 특정 문서를 직접 인용하거나 명시적으로 언급하는 것은 꼭 필요한 경우에만 하세요. 목표는 모든 지식을 당신의 이해에서 비롯된 것처럼 제공하여 자연스럽고 유익하게 대화를 이끌어가는 것입니다. 
-            \n\n 주어진 문맥: {context}
-            \n\n 질문의 본질에 집중하고 통합된 지식을 활용하여 대화를 심도 있고 정확하게 풍부하게 만드세요.
-            """)
-    if 'system_prompt' not in st.session_state:
-        st.session_state['system_prompt'] = default_prompt
-    
+
 
     # File uploader
     uploaded_files = st.file_uploader("벡터데이터베이스 구축을 위한 파일을 선택해 주세요.", type=["pdf", "png", "jpg", "jpeg"], accept_multiple_files=True)

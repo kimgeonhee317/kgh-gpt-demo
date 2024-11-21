@@ -25,9 +25,6 @@ import streamlit as st
 load_dotenv()
 chromadb.api.client.SharedSystemClient.clear_system_cache()
 
-# This function is used to format(concatenate) the page content of the documents
-def format_docs(docs): 
-    return "\n\n".join(doc.page_content for doc in docs)
 
 def add_message(role, content):
     st.session_state.messages.append((role, content))
@@ -39,7 +36,7 @@ def get_rag_chain():
         ]
 
     prompt = ChatPromptTemplate.from_messages(st.session_state.messages)
-    print(f"Prompttt: {st.session_state.messages}")
+    print(f"Prompt: {st.session_state.messages}")
     # 임베딩 모델 정의
     clovax_embeddings = ClovaXEmbeddings(model='bge-m3')
     ClovaXEmbeddings.Config.protected_namespaces = ()
@@ -58,22 +55,23 @@ def get_rag_chain():
     retriever = vectorstore.as_retriever(
         kwargs={"k": 5},
         search_type="similarity_score_threshold",
-        search_kwargs={"score_threshold": 0.5, "k": 3}
+        search_kwargs={"score_threshold": 0.1, "k": 3}
     )
+
     print("Vectorstore is now accessible for retrieval only.")
 
     
     # Define the LLM
     llm = ChatClovaX(
         model="HCX-003",
-        max_tokens=2048,
+        max_tokens=1024,
         temperature=0.5,
         repeat_penalty=5
     )
 
     # Define the RAG chain
     rag_chain_from_docs = (
-        RunnablePassthrough.assign(context=(lambda x: format_docs(x["context"])))
+        RunnablePassthrough.assign(context=(lambda x: format_docs_with_metadata(x["context"])))
         | prompt
         | llm
         | StrOutputParser()
@@ -83,4 +81,17 @@ def get_rag_chain():
         {"context": retriever, "question": RunnablePassthrough()}
     ).assign(answer=rag_chain_from_docs)
 
+    # This function is used to format(concatenate) the page content of the documents
+    def format_docs(docs): 
+        return "\n\n".join(doc.page_content for doc in docs)
+
+    def format_docs_with_metadata(docs):
+        """
+        Format documents by combining their content with metadata (source name).
+        """
+        formatted_docs = []
+        for doc in docs:
+            source = doc.metadata.get("source", "Unknown source")
+            formatted_docs.append(f"Source: {source}\nContent: {doc.page_content}")
+        return "\n\n".join(formatted_docs)
     return rag_chain_with_source
