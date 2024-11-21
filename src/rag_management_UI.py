@@ -49,9 +49,7 @@ def show_ragmgmt_UI():
                         print("\n샘플 청크 (처음 3개):")
                         for i, chunk in enumerate(chunks[:3], 1):
                             print(f"\n청크 {i}:")
-                            print(f"메타데이터: {chunk.metadata}")
-                            print(f"내용: {chunk.page_content}")
-                            print(f"길이: {len(chunk.page_content)} 문자")
+                            print(chunk)
                         st.success("파일 분할 완료: " + str(uploaded_file.name))
                         create_vector_database(chunks)
                         st.success("벡터 데이터베이스 저장 완료: " + str(uploaded_file.name))

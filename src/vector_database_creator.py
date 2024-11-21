@@ -45,12 +45,3 @@ def create_vector_database(chunks):
         
         # Update progress bar
         progress_bar.progress((index + 1) / total_documents)
-
-# Example usage
-if __name__ == "__main__":
-    st.title("Vector Database Creator")
-    # Replace this with your actual list of document chunks
-    sample_chunks = [
-        {'page_content': "Sample text", 'metadata': {"source": "Sample source"}}
-    ]
-    create_vector_database(sample_chunks)
