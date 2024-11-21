@@ -116,6 +116,7 @@ def segment_documents(documents):
         print(data)
         try:
             request_data = {
+
                 "alpha": -100, # 문단 나누기를 위한 thresholds 값. 클수록 나눠지는 문단 수 증가
                 "segCnt": -1, # 원하는 문단 나누기 수 - 범위: 1 이상 (-1로 설정 시 모델이 최적 문단 수로 분리)
                 "postProcessMinSize": 300, # post process module 적용 시 문단에 포함되는 문자열의 최소 글자 수
