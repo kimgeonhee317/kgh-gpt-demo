@@ -25,8 +25,6 @@ def show_ragmgmt_UI():
 
     st.write("---"*40)
 
-
-
     # File uploader
     uploaded_files = st.file_uploader("벡터데이터베이스 구축을 위한 파일을 선택해 주세요.", type=["pdf", "png", "jpg", "jpeg"], accept_multiple_files=True)
     finish_upload = st.button('업로드 및 파이프라인 구축 시작')

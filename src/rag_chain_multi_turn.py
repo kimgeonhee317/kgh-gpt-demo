@@ -55,7 +55,7 @@ def get_rag_chain():
     retriever = vectorstore.as_retriever(
         kwargs={"k": 5},
         search_type="similarity_score_threshold",
-        search_kwargs={"score_threshold": 0.1, "k": 3}
+        search_kwargs={"score_threshold": 0.5, "k": 3}
     )
 
     print("Vectorstore is now accessible for retrieval only.")

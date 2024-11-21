@@ -113,13 +113,14 @@ def segment_documents(documents):
     chunked_data = []
 
     for data in tqdm(documents):
-        print(data)
+        #print(data)
         try:
             request_data = {
+                "postProcessMaxSize": 100,
                 "alpha": -100, # 문단 나누기를 위한 thresholds 값. 클수록 나눠지는 문단 수 증가
                 "segCnt": -1, # 원하는 문단 나누기 수 - 범위: 1 이상 (-1로 설정 시 모델이 최적 문단 수로 분리)
-                "postProcessMinSize": 100, # post process module 적용 시 문단에 포함되는 문자열의 최소 글자 수
-                "postProcessMaxSize": 200,
+                # "postProcessMinSize": 100, # post process module 적용 시 문단에 포함되는 문자열의 최소 글자 수
+                "postProcessMaxSize": -1,
                 "text": data.page_content,
                 "postProcess": True  # 문단 나누기 수행 후 원하는 길이로 문단을 합치거나 나누는 후처리 수행 여부, true 작동
             }
