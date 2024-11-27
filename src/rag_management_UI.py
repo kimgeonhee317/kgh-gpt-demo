@@ -44,7 +44,7 @@ def show_ragmgmt_UI():
                     saved_file_names.append(uploaded_file.name)
                     try:
                         chunks = process_document(file_path)  # Ensure this handles local paths
-                        print(chunks)
+                        #print(chunks)
                         st.success("파일 분할 완료: " + str(uploaded_file.name))
                         create_vector_database(chunks)
                         st.success("벡터 데이터베이스 저장 완료: " + str(uploaded_file.name))

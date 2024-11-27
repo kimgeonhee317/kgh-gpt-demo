@@ -15,6 +15,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from pprint import pprint
 from langchain.schema.runnable import RunnableParallel
 from pydantic import ConfigDict
+
 import time
 import uuid
 from uuid import uuid4
@@ -36,7 +37,7 @@ def get_rag_chain():
         ]
 
     prompt = ChatPromptTemplate.from_messages(st.session_state.messages)
-    print(f"Prompt: {st.session_state.messages}")
+    print(f"Prompt(Message): {st.session_state.messages}")
     # 임베딩 모델 정의
     clovax_embeddings = ClovaXEmbeddings(model='bge-m3')
     ClovaXEmbeddings.Config.protected_namespaces = ()
@@ -60,7 +61,6 @@ def get_rag_chain():
 
     print("Vectorstore is now accessible for retrieval only.")
 
-    
     # Define the LLM
     llm = ChatClovaX(
         model="HCX-003",
