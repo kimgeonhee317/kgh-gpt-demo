@@ -37,7 +37,8 @@ def get_rag_chain():
         ]
 
     prompt = ChatPromptTemplate.from_messages(st.session_state.messages)
-    print(f"Prompt(Message): {st.session_state.messages}")
+    prompt.pretty_print() # Print the prompt
+
     # 임베딩 모델 정의
     clovax_embeddings = ClovaXEmbeddings(model='bge-m3')
     ClovaXEmbeddings.Config.protected_namespaces = ()
@@ -80,7 +81,7 @@ def get_rag_chain():
     rag_chain_with_source = RunnableParallel(
         {"context": retriever, "question": RunnablePassthrough()}
     ).assign(answer=rag_chain_from_docs)
-
+    
     # This function is used to format(concatenate) the page content of the documents
     def format_docs(docs): 
         return "\n\n".join(doc.page_content for doc in docs)
@@ -94,4 +95,6 @@ def get_rag_chain():
             source = doc.metadata.get("source", "Unknown source")
             formatted_docs.append(f"Source: {source}\nContent: {doc.page_content}")
         return "\n\n".join(formatted_docs)
+
+        
     return rag_chain_with_source

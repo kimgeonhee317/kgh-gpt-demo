@@ -10,7 +10,6 @@ import getpass
 from dotenv import load_dotenv
 #from src.document_processor import process_document, show_chunk
 from src.document_segmentation import process_document, show_chunk
-from src.rag_chain import create_rag_chain
 from src.session_management import load_session, delete_session, save_session
 from src.default_UI import show_default_UI
 from src.onboarding import execute_onboarding

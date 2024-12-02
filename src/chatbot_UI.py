@@ -3,15 +3,15 @@ import os
 from src.session_management import save_session
 from src.global_settings import STORAGE_PATH
 from src.rag_chain_multi_turn import  get_rag_chain
-from src.document_segmentation import process_document, show_chunk
 from src.utils import stream_response
-
+from src.query_rewriting import create_rewritten_query
 def initialize_rag_chain():
     if st.session_state.get('rag_chain') is None:
         with st.spinner("Initializing RAG pipeline..."):
             st.session_state['rag_chain'] = get_rag_chain()
             st.session_state.urls = []
             st.session_state.source_contents = []
+            st.session_state.rewrite = False
 
 def display_system_prompt():
     default_prompt = (
@@ -27,29 +27,36 @@ def display_system_prompt():
 def handle_query():
     query = st.session_state.query
     if query:
-        if st.session_state.get('rag_chain'):
-            # Append the user query to the conversation history
-            st.session_state.messages.append(("human", query))
-            with st.spinner("답변 생성 중..."):
-                # Invoke the RAG chain
-                st.session_state.rag_chain = get_rag_chain()
-                response = st.session_state.rag_chain.invoke(query)
-                naive_stream = st.session_state.rag_chain.stream(query)
-                # 스트리밍 출력
-                for chunk in naive_stream:
-                    print(f"Type: {type(chunk)}, Content: {chunk}")
-                # Append the AI response to the conversation history
-                st.session_state.messages.append(("ai", response['answer']))
-                # Store the query and response for display
-                st.session_state.responses.append((query, response['answer']))
-                st.session_state.query = ""  # Clear the input for the next message
-
-                # rag source
-                st.session_state.urls.append(list({doc.metadata['source'] for doc in response['context']}))
-                st.session_state.source_contents.append(list([doc.page_content for doc in response['context']]))
-
+        if st.session_state.rewrite:
+            # Rewrite the query
+            r_query = create_rewritten_query(query = query)
         else:
-            st.error("RAG model is not set up.")
+            r_query = query
+        # Append the user query to the conversation history
+        st.session_state.messages.append(("human", r_query))
+        with st.spinner("답변 생성 중..."):
+            # Invoke the RAG chain
+            st.session_state.rag_chain = get_rag_chain()
+            response = st.session_state.rag_chain.invoke(r_query)
+            naive_stream = st.session_state.rag_chain.stream(query)
+            # # 스트리밍 출력
+            # for chunk in naive_stream:
+            #     print(f"Type: {type(chunk)}, Content: {chunk}")
+            # Append the AI response to the conversation history
+            st.session_state.messages.append(("ai", response['answer']))
+            # Store the query and response for display
+            st.session_state.responses.append((query, response['answer']))
+            st.session_state.query = ""  # Clear the input for the next message
+
+            # rag source
+            print(f"raw response context {response['context']}")
+            if len(response['context']) == 0:
+                st.session_state.urls.append([])
+            else:
+                st.session_state.urls.append(list(response['context']))
+            #print(st.session_state.urls)
+            # st.session_state.source_contents.append(list({doc.page_content for doc in response['context']}))
+            # print(st.session_state.source_contents)
     else:
         st.error("Please enter a query.")
 
@@ -63,6 +70,8 @@ def show_chatbot_UI():
         st.session_state.messages = [("system", st.session_state.system_prompt)]
 
     st.title("챗봇 대화하기")
+    rewrite = st.checkbox("Rewrite")
+    st.session_state.rewrite = rewrite
 
     # Display conversation history
     with st.container():
@@ -70,17 +79,15 @@ def show_chatbot_UI():
             st.markdown(f"**You:** {query}")
             st.markdown(f"**Assistant:** {response}")
 
-            temp_source = st.session_state.urls[idx]
-            temp_source_contents = st.session_state.source_contents[idx]
-
-            if len(temp_source) == 0:
+            if len(st.session_state.urls[idx]) == 0:
                 st.info(f'**검색된 문서 없음**')
             else:
                 #st.info(f'**전체** {temp_source_contents}')
-                for i in range(len(temp_source)):
-                    st.info(f'**검색된 문서 {i+1}:** {temp_source[i]} \n\n **검색된 문서 내용:** {temp_source_contents[i]}')
+                for i in range(len(st.session_state.urls[idx])):
+                    st.info(f'**검색된 문서 {i+1}:** {st.session_state.urls[idx][i].metadata} \n\n **검색된 내용 {i+1}:** {st.session_state.urls[idx][i].page_content} \n\n')
+                # for i in range(len(st.session_state.source_contents[idx])):
+                #     st.info(f"**검색된 문서 내용 {i+1}:** {st.session_state.source_contents[idx][i]}")
                     
-
         if st.session_state.responses:
             st.session_state.last_query = st.session_state.responses[-1][0]  # Scroll to last query
 
@@ -101,7 +108,7 @@ def show_chatbot_UI():
     if st.button("시스템 프롬프트 변경"):
         st.session_state.system_prompt = user_prompt
         # complete
-        st.success("시스템 프롬프트가 변경되었습니다.")
+        st.success("시스템 프롬프트가 변경되었습니다. 대화를 초기화하여야만 적용됩니다.")
         st.rerun()
 
     st.write('---')

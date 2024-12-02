@@ -33,12 +33,13 @@ def create_vector_database(chunks):
     # Add documents loop with Streamlit progress bar
     for index, doc in tqdm(enumerate(chunks)):
         embeddings = clovax_embeddings.embed_documents([doc.page_content])[0]
-        
+        print(len(embeddings))
+
         # Add document to the vector database
         chroma_collection.add(
             ids=[str(uuid.uuid4())],
             documents=[doc.page_content],
-            embeddings=[embeddings],
+            embeddings=embeddings,
             metadatas=[doc.metadata]
         )
         time.sleep(1.1)  # Controlled delay for usage limits

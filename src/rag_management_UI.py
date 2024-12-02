@@ -1,11 +1,9 @@
 import streamlit as st
 import os
-from src.session_management import save_session
 from src.global_settings import STORAGE_PATH
-from src.rag_chain import create_rag_chain
 from src.document_segmentation import process_document, show_chunk
+from src.document_processor import process_pdf, show_chunk
 from src.vector_database_creator import create_vector_database
-from src.default_UI import show_default_UI
 from src.db_access import get_embedded_documents, delete_documents
 
 
@@ -43,7 +41,8 @@ def show_ragmgmt_UI():
                         f.write(uploaded_file.getbuffer())
                     saved_file_names.append(uploaded_file.name)
                     try:
-                        chunks = process_document(file_path)  # Ensure this handles local paths
+                        #chunks = process_document(file_path)  # Ensure this handles local paths
+                        chunks = process_pdf(file_path)
                         #print(chunks)
                         st.success("파일 분할 완료: " + str(uploaded_file.name))
                         create_vector_database(chunks)
