@@ -40,10 +40,11 @@ def main():
             os.environ["NCP_CLOVASTUDIO_APP_ID_SEGMENTATION"] = segmentation_id
 
         st.write("== UPDATE LOG ==")
-        st.write("2021-11-13: initial version")
-        st.write("2021-11-18: add HCX segmentator to the pipeline")
-        st.write("2021-11-19: add Session management, multi-turn RAG chatbot")
-        st.write("2021-11-20: demo v0.2: present RAG retrieved source for each turn")
+        st.write("2024-11-13: initial version")
+        st.write("2024-11-18: add HCX segmentator to the pipeline")
+        st.write("2024-11-19: add Session management, multi-turn RAG chatbot")
+        st.write("2024-11-20: demo v0.2: present RAG retrieved source for each turn")
+        st.write("2024-12-3: query rewriting feature is added")
 
     # (!) only for the local
     if not studio_key:
